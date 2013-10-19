@@ -3,6 +3,7 @@ package controllers
 import (
     "github.com/robfig/revel"
     "gorp/app/models"
+    "log"
 )
 
 type Channels struct {
@@ -18,17 +19,32 @@ func (c Channels) Show(id string) revel.Result {
     defer conn.Close()
 
     //key := c.Params.Get("id")
-
-    channel := models.GetChannel(conn, id)
+    log.Print(id)
+    channel := models.NewChannel(conn, id)
+    channel.Get()
 
     return c.RenderJson(channel.Messages)
 }
 
-func (c Channels) Append(id string, data string) revel.Result {
+func (c Channels) Pop(id string) revel.Result {
     conn := Pool.Get()
     defer conn.Close()
 
-    models.AppendChannel(conn, id, data)
+    //key := c.Params.Get("id")
+    log.Print(id)
+    channel := models.NewChannel(conn, id)
+    channel.Pop()
+
+    return c.RenderJson(channel.Messages)
+}
+
+
+func (c Channels) Append(id string, message string) revel.Result {
+    conn := Pool.Get()
+    defer conn.Close()
+
+    channel := models.NewChannel(conn, id)
+    channel.Append(message)
 
     return c.RenderJson("OK")
 }

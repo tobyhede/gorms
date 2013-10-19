@@ -5,7 +5,6 @@ import (
     "github.com/garyburd/redigo/redis"
     "time"
     "log"
-    "gorp/app/models"
 )
 var (
     Pool *redis.Pool
@@ -16,11 +15,8 @@ type App struct {
 }
 
 func (c App) Index() revel.Result {
-    channel := models.NewChannel()
-
-    return c.RenderJson(channel.String())
+    return c.Render()
 }
-
 
 func init_pool() {
     maxIdle := 5

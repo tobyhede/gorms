@@ -4,38 +4,64 @@ package models
 import (
     "github.com/garyburd/redigo/redis"
     "log"
+    "fmt"
 )
 
 type Channel struct {
     Key         string
     Messages    []string
+    conn        redis.Conn
 }
 
-func NewChannel() *Channel {
-    return &Channel{}
+func NewChannel(conn redis.Conn, key string) *Channel {
+    log.Print("NewChannel")
+    return &Channel{conn: conn, Key: key}
 }
 
-func GetChannel(conn redis.Conn, key string) *Channel {
-    c := NewChannel()
-    log.Print("GetChannel")
-    log.Print(key)
+func (c *Channel) Get() {
+    log.Print("Get")
+    log.Print(c.conn)
+    log.Print(c.Key)
 
-    messages, err := redis.Strings(conn.Do("LRANGE", key, 0, 10))
+    messages, err := redis.Strings(c.conn.Do("LRANGE", c.Key, 0, 10))
+    c.Messages = messages
+
+    log.Print(messages)
+
+    if err != nil {
+        log.Fatal(err)
+    }
+}
+
+func (c *Channel) Pop() {
+
+    str := `local result = redis.call('LRANGE','%s',0,10); redis.call('LTRIM','%s',1,-10); return result;`
+
+    log.Print(fmt.Sprintf(str, c.Key, c.Key))
+    script := redis.NewScript(0, fmt.Sprintf(str, c.Key, c.Key))
+
+    //log.Print(script)
+    messages, err := redis.Strings(script.Do(c.conn))
+
+    //log.Print("--------------------------")
+    //log.Print(messages)
+    //log.Print("--------------------------")
+
     c.Messages = messages
 
     if err != nil {
         log.Fatal(err)
     }
 
-    return c
+    //log.Print(messages)
 }
 
-func AppendChannel(conn redis.Conn, key, data string) string {
+func (c Channel) Append(message string) string {
     log.Print("AppendChannel")
-    log.Print(key)
-    log.Print(data)
+    log.Print(c.Key)
+    log.Print(message)
 
-    res, err := conn.Do("RPUSH", key, data)
+    res, err := c.conn.Do("RPUSH", c.Key, message)
 
     log.Print(res)
     log.Print(err)
