@@ -12,7 +12,7 @@ G.O.R.M.S. allows messages to be published to a **Channel** identified by an **I
 
 Messages can be any valid JSON-friendly string. 
 
-### GET
+### Get
 #### GET channels/:id
 
 Returns a JSON array of the last 10 messages for the **ID** Channel.
