@@ -39,7 +39,7 @@ GET/append isn't by-the-book REST, but it is certainly easier to test.
 
 
 ```
-    /channels/vtha/append?message={"time":"%202013-10-19T21:18:45",%20"message":"blah"}
+    /channels/vtha/append?message={"time":"2013-10-19T21:18:45","message":"blah"}
     "OK"
   
     curl -X POST --data "message=hello" http://gorms.io/channels/vtha/
