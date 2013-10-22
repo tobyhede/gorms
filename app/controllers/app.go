@@ -33,11 +33,15 @@ func init_pool() {
             }
             return conn, err
         },
+        TestOnBorrow: func(c redis.Conn, t time.Time) error {
+            _, err := c.Do("PING")
+            return err
+        },
     }
 }
 
 func init() {
-    log.Print("Init")
+    //log.Print("Init")
     init_pool()
 }
 
