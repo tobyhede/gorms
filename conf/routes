@@ -9,14 +9,18 @@ GET     /                                       App.Index
 
 
 GET     /channels                               Channels.Index
-GET     /channels/:id                           Channels.Show
-GET     /channels/:id/pop                       Channels.Pop
 
-GET     /channels/:id/append                    Channels.Append
+GET     /channels/:id                           Channels.Show
+GET     /channels/:id/messages                  Channels.Show
 
 POST    /channels/:id                           Channels.Append
+GET     /channels/:id/append                    Channels.Append
 
+POST    /channels/:id/messages                  Channels.Append
+GET     /channels/:id/messages/append           Channels.Append
 
+DELETE  /channels/:id/messages/                 Channels.Pop
+GET     /channels/:id/pop                       Channels.Pop
 
 
 # Ignore favicon requests
