@@ -18,7 +18,7 @@ func (c Channels) Show(id string) revel.Result {
     conn := Pool.Get()
     defer conn.Close()
 
-    //key := c.Params.Get("id")
+    //c.Validation.Required(id)
     log.Print(id)
     channel := models.NewChannel(conn, id)
     channel.Get()
