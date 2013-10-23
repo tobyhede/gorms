@@ -3,6 +3,7 @@ package models
 //import "github.com/nu7hatch/gouuid"
 import (
 	"github.com/garyburd/redigo/redis"
+	"github.com/robfig/revel"
 	"github.com/robfig/revel/modules/jobs/app/jobs"
 	j "gorp/app/jobs"
 	"log"
@@ -32,6 +33,7 @@ func (c *Channel) Get() {
 
 	if err != nil {
 		log.Fatal(err)
+		revel.ERROR.Fatal(err)
 	}
 }
 
@@ -42,20 +44,14 @@ func (c *Channel) Pop() {
 	log.Print(fmt.Sprintf(str, c.Key, c.Key))
 	script := redis.NewScript(0, fmt.Sprintf(str, c.Key, c.Key))
 
-	//log.Print(script)
 	messages, err := redis.Strings(script.Do(c.conn))
-
-	//log.Print("--------------------------")
-	//log.Print(messages)
-	//log.Print("--------------------------")
 
 	c.Messages = messages
 
 	if err != nil {
 		log.Fatal(err)
+		revel.ERROR.Fatal(err)
 	}
-
-	//log.Print(messages)
 }
 
 func (c Channel) Append(message string) string {
@@ -70,6 +66,7 @@ func (c Channel) Append(message string) string {
 
 	if err != nil {
 		log.Fatal(err)
+		revel.ERROR.Fatal(err)
 	}
 	
 	jobs.Now(j.CreateMeta{})
