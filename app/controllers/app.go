@@ -12,13 +12,14 @@ var (
 
 type App struct {
 	*revel.Controller
+	Conn redis.Conn
 }
 
 func (c App) Index() revel.Result {
 	return c.Render()
 }
 
-func init_pool() {
+func initPool() {
 	maxIdle := 5
 	idleTimeout := 240 * time.Second
 
@@ -40,7 +41,19 @@ func init_pool() {
 	}
 }
 
+func (c *App) Connect() revel.Result {
+	c.Conn = Pool.Get()
+	return nil
+}
+
+func (c *App) Close() revel.Result {
+	c.Conn.Close()
+	return nil
+}
+
 func init() {
 	//log.Print("Init")
-	init_pool()
+	initPool()
+	revel.InterceptMethod((*App).Connect, revel.BEFORE)
+	revel.InterceptMethod((*App).Close, revel.FINALLY)
 }
