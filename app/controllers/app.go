@@ -1,11 +1,14 @@
 package controllers
 
-import (
+import (	
+	"fmt"
 	"github.com/robfig/revel"
 	"github.com/garyburd/redigo/redis"
-	"time"
 	"log"
+	"time"
+
 )
+
 var (
 	Pool *redis.Pool
 )
@@ -19,16 +22,33 @@ func (c App) Index() revel.Result {
 	return c.Render()
 }
 
-func initPool() {
-	maxIdle := 5
-	idleTimeout := 240 * time.Second
 
+func getConfig(config string) int {
+	value, found := revel.Config.Int(config)
+	
+	if !found {
+		revel.ERROR.Fatal(fmt.Sprintf("Configuration [%s] not found", config))
+	}
+
+	return value
+}
+
+func Init() {
+	log.Print("==== INIT ====")
+
+	maxIdle			:= getConfig("redis.pool.maxidle")
+	idleTimeout 	:= time.Duration(getConfig("redis.pool.timeout")) * time.Second
+	maxActive 		:= getConfig("redis.pool.maxactive")
+	port 			:= fmt.Sprintf(":%d", getConfig("redis.port"))
+	
 	Pool = &redis.Pool{
 		MaxIdle: maxIdle,
+		MaxActive: maxActive,
 		IdleTimeout: idleTimeout,
+
 		Dial: func() (redis.Conn, error) {
 			log.Print("Dial")
-			conn, err := redis.Dial("tcp", ":6379")
+			conn, err := redis.Dial("tcp", port)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -53,7 +73,8 @@ func (c *App) Close() revel.Result {
 
 func init() {
 	//log.Print("Init")
-	initPool()
+	//initPool()
+	revel.OnAppStart(Init)
 	revel.InterceptMethod((*App).Connect, revel.BEFORE)
 	revel.InterceptMethod((*App).Close, revel.FINALLY)
 }
