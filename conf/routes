@@ -22,7 +22,6 @@ GET     /channels/:id/messages/append           Channels.Append
 DELETE  /channels/:id/messages/                 Channels.Pop
 GET     /channels/:id/pop                       Channels.Pop
 
-
 # Ignore favicon requests
 GET     /favicon.ico                            404
 

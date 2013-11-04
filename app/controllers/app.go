@@ -1,12 +1,11 @@
 package controllers
 
-import (	
+import (
 	"fmt"
 	"github.com/robfig/revel"
 	"github.com/garyburd/redigo/redis"
 	"log"
 	"time"
-
 )
 
 var (
@@ -71,10 +70,47 @@ func (c *App) Close() revel.Result {
 	return nil
 }
 
+func (c *App) ValidateId() revel.Result {
+	//if id := c.Params.Get("id"); id != "" {
+		//c.Validation.Required(!strings.HasPrefix(id, "auth:"))
+
+		//if c.Validation.HasErrors() {
+			//log.Fatal("Invalid Key")
+			//revel.ERROR.Fatal("Invalid Key")
+		//}
+	//}
+	return nil
+}
+
+func (c *App) Validate() revel.Result {
+
+	//auth := c.Request.Header["Authorization"]
+	
+	//log.Print(auth)
+
+	//str := `local result = redis.call('LRANGE','%s',0,10); redis.call('LTRIM','%s',1,-10); return result;`
+	//script := redis.NewScript(0, fmt.Sprintf(str, c.Key, c.Key))
+
+	//messages, err := redis.Strings(script.Do(c.conn))
+
+	//c.Messages = messages
+
+	//if err != nil {
+		//log.Fatal(err)
+		//revel.ERROR.Fatal(err)
+	//}
+
+
+	return nil
+}
+
+
 func init() {
 	//log.Print("Init")
 	//initPool()
 	revel.OnAppStart(Init)
+	revel.InterceptMethod((*App).ValidateId, revel.BEFORE)
 	revel.InterceptMethod((*App).Connect, revel.BEFORE)
+	revel.InterceptMethod((*App).Validate, revel.BEFORE)
 	revel.InterceptMethod((*App).Close, revel.FINALLY)
 }
