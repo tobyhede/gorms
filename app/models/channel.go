@@ -23,13 +23,13 @@ func unique() string {
 
 type Channel struct {
 	Key			string
-	Messages	[]string
+	Messages	[]Message
 	Msg 		map[string]string
 	conn		redis.Conn
 }
 
 type Message struct {
-	Timestamp 	int64
+	Timestamp 	string
 	Message 	string
 }
 
@@ -79,20 +79,29 @@ func (c *Channel) Get() {
 	//messages, err := redis.Strings(c.conn.Do("LRANGE", c.Key, 0, 10))
 	messages, err := redis.Strings(c.conn.Do("ZREVRANGE", c.Key, 0, 10, "WITHSCORES"))
 
-	m := make(map[string]string)
+	//m := make(map[string]string)
+	log.Print(len(messages)/2)
+	m := make([]Message, 0, len(messages)/2)
 	log.Print("*****************")
 	log.Print("*****************")
 
+	log.Print(m)
+
+
 	for index,element := range messages {
 		if index % 2 == 1 {
-			m[element] = messages[index-1]
+			//m[element] = messages[index-1]
+			log.Print(element)
+			msg := &Message{Timestamp: element, Message: messages[index-1]}
+			log.Print(msg)
+			m = append(m, *msg)
 		}
 	}
 	
 	//messages, err := redis.Values(c.conn.Do("ZREVRANGE", c.Key, 0, 10, "WITHSCORES"))
 	log.Print(m)
-	////c.Messages = messages
-	c.Msg = m
+	c.Messages = m
+	//c.Msg = m
 	//var m []struct {
         //Message  string
 		//Timestamp string
@@ -111,18 +120,18 @@ func (c *Channel) Get() {
 
 func (c *Channel) Pop() {
 
-	str := `local result = redis.call('LRANGE','%s',0,10); redis.call('LTRIM','%s',1,-10); return result;`
+	//str := `local result = redis.call('LRANGE','%s',0,10); redis.call('LTRIM','%s',1,-10); return result;`
 
-	script := redis.NewScript(0, fmt.Sprintf(str, c.Key, c.Key))
+	//script := redis.NewScript(0, fmt.Sprintf(str, c.Key, c.Key))
 
-	messages, err := redis.Strings(script.Do(c.conn))
+	////messages, err := redis.Strings(script.Do(c.conn))
 
-	c.Messages = messages
+	////c.Messages = messages
 
-	if err != nil {
-		log.Fatal(err)
-		revel.ERROR.Fatal(err)
-	}
+	//if err != nil {
+		//log.Fatal(err)
+		//revel.ERROR.Fatal(err)
+	//}
 }
 
 func (c Channel) Append(message string) string {
@@ -152,7 +161,7 @@ func (c Channel) Append(message string) string {
 }
 
 
-func (c Channel) GetMessages() []string {
+func (c Channel) GetMessages() []Message {
 	return c.Messages
 }
 

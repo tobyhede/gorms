@@ -19,7 +19,7 @@ func (c Channels) Show(id string) revel.Result {
 	channel := models.NewChannel(c.Conn, id)
 	channel.Get()
 
-	return c.RenderJson(channel.Msg)
+	return c.RenderJson(channel.Messages)
 }
 
 func (c Channels) Pop(id string) revel.Result {
