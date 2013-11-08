@@ -11,11 +11,13 @@ import (
 	"fmt"
 	"log"
 	"time"
+	"strconv"
 )
 
 
 func unique() string {
-	bytes := []byte("dg239asdkh6yasckjg")
+	s := strconv.FormatInt(time.Now().UnixNano(),10)
+	bytes := []byte(s)
     hasher := sha256.New()
     hasher.Write(bytes)
     return base64.URLEncoding.EncodeToString(hasher.Sum(nil))
@@ -24,13 +26,13 @@ func unique() string {
 type Channel struct {
 	Key			string
 	Messages	[]Message
-	Msg 		map[string]string
+	Msg			map[string]string
 	conn		redis.Conn
 }
 
 type Message struct {
-	Timestamp 	string
-	Message 	string
+	Timestamp	string	`json:"timestamp"`
+	Message		string	`json:"message"`
 }
 
 // read 4
