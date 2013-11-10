@@ -124,7 +124,9 @@ func (c *Channel) Pop() {
 
 	//str := `local result = redis.call('LRANGE','%s',0,10); redis.call('LTRIM','%s',1,-10); return result;`
 
-	//script := redis.NewScript(0, fmt.Sprintf(str, c.Key, c.Key))
+	str := `local result = c.conn.Do("ZREVRANGE", %s, 0, 10, "WITHSCORES"); redis.call('ZREMRANGEBYRANK','%s',0, 9); return result;`
+
+	script := redis.NewScript(0, fmt.Sprintf(str, c.Key, c.Key))
 
 	////messages, err := redis.Strings(script.Do(c.conn))
 
